@@ -1,87 +1,30 @@
+import React from "react";
 import { Button, Stack, Typography } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import React, { useState } from "react";
 import { useMutation, useQuery } from "react-query";
+import { Form, useNavigate } from "react-router-dom";
+import { RequestBody, createPricingRequestBody, fetchDwellingPrices } from "./dataLoaders/dwellingPricesLoader";
+import { fetchData } from "./dataLoaders/initialDataLoader";
+import { transformArray } from "./utils";
 
-const fetchData = async (requestBody: RequestBody) => {
-  const apiUrl = "https://data.ssb.no/api/v0/en/table/07241";
-
-  const response = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(requestBody),
-  });
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-
-  return response.json();
-};
-
-interface RequestBody {
-  query: QueryItem[];
-  response: {
-    format: string;
-  };
+interface PriceValue {
+  date: string;
+  price: number;
 }
 
-interface QueryItem {
-  code: string;
-  selection: {
-    filter: string;
-    values: (string | undefined)[];
-  };
-}
-
-const requestBody = {
-  query: [
-    {
-      code: "Boligtype",
-      selection: {
-        filter: "item",
-        values: ["00", "02", "03"],
-      },
-    },
-    {
-      code: "ContentsCode",
-      selection: {
-        filter: "item",
-        values: ["KvPris", "Omsetninger"],
-      },
-    },
-    {
-      code: "Tid",
-      selection: {
-        filter: "all",
-        values: ["*"],
-      },
-    },
-  ],
-  response: {
-    format: "json-stat2",
-  },
-};
-
-const Form = () => {
+const DwellingPricesForm = () => {
   const [type, setType] = React.useState("");
   const [startYear, setStartYear] = React.useState("");
   const [startQuarter, setStartQuarter] = React.useState("");
   const [endYear, setEndYear] = React.useState("");
   const [endQuarter, setEndQuarter] = React.useState("");
-  const [priceValues, setPriceValues] = useState([]);
+  const navigate = useNavigate();
 
-  const handleChange = (event: SelectChangeEvent, setter: React.Dispatch<React.SetStateAction<string>>) => {
-    setter(event.target.value as string);
-  };
-
-  const { data, isLoading, isError } = useQuery("myData", () => fetchData(requestBody));
-  const mutation = useMutation((body: RequestBody) => fetchData(body));
+  const { data, isLoading, isError } = useQuery("initialData", () => fetchData());
+  const mutation = useMutation((body: RequestBody) => fetchDwellingPrices(body));
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -89,30 +32,6 @@ const Form = () => {
 
   if (isError) {
     return <p>Error fetching data</p>;
-  }
-
-  type OriginalArrayItem = string;
-
-  type TransformedObject = {
-    [year: string]: {
-      quartersAvailable: string[];
-    };
-  };
-
-  function transformArray(originalArray: OriginalArrayItem[]): TransformedObject {
-    return originalArray.reduce((acc, item) => {
-      const matchResult = item.match(/(\d{4})K(\d)/);
-
-      if (matchResult) {
-        const [year, quarter] = matchResult.slice(1) as [string, string]; // Extract year and quarter
-        if (!acc[year]) {
-          acc[year] = { quartersAvailable: [] };
-        }
-        acc[year].quartersAvailable.push(`K${quarter}`);
-      }
-
-      return acc;
-    }, {} as TransformedObject);
   }
 
   const dwellings = data.dimension.Boligtype.category.label;
@@ -129,42 +48,23 @@ const Form = () => {
 
   const quartersRange = allQuarters.slice(allQuarters.indexOf(startData), allQuarters.indexOf(endData) + 1);
 
-  const pricingRequestBody = {
-    query: [
-      {
-        code: "Boligtype",
-        selection: {
-          filter: "item",
-          values: [selectedDwellingTypeId],
-        },
-      },
-      {
-        code: "ContentsCode",
-        selection: {
-          filter: "item",
-          values: ["KvPris"],
-        },
-      },
-      {
-        code: "Tid",
-        selection: {
-          filter: "item",
-          values: [...quartersRange],
-        },
-      },
-    ],
-    response: {
-      format: "json-stat2",
-    },
+  const handleClick = async () => {
+    const pricingRequestBody = createPricingRequestBody(selectedDwellingTypeId, quartersRange);
+    const result = await mutation.mutateAsync(pricingRequestBody);
+    const priceValuesByDate: PriceValue[] = result.value.map((value: number, index: number) => ({
+      date: quartersRange[index],
+      price: value,
+    }));
+    const path = `/prices/${type}/${startYear}/${startQuarter}/${endYear}/${endQuarter}`;
+    navigate(path, { state: { priceValuesByDate } });
   };
 
-  const handleClick = async () => {
-    const result = await mutation.mutateAsync(pricingRequestBody);
-    setPriceValues(result.value);
+  const handleChange = (event: SelectChangeEvent, setter: React.Dispatch<React.SetStateAction<string>>) => {
+    setter(event.target.value as string);
   };
 
   return (
-    <>
+    <Form method="post">
       <Stack spacing={2.4} width={400}>
         <FormControl fullWidth>
           <InputLabel id="type">Type</InputLabel>
@@ -208,7 +108,7 @@ const Form = () => {
               >
                 {quartersAvailableByYear[startYear]?.quartersAvailable.map((quarter, index) => (
                   <MenuItem key={index} value={String(quarter)}>
-                    {String(quarter)}
+                    {String(quarter.slice(1))}
                   </MenuItem>
                 ))}
               </Select>
@@ -261,7 +161,7 @@ const Form = () => {
                   })
                   .map((quarter, index) => (
                     <MenuItem key={index} value={String(quarter)}>
-                      {String(quarter)}
+                      {String(quarter.slice(1))}
                     </MenuItem>
                   ))}
               </Select>
@@ -277,7 +177,7 @@ const Form = () => {
           Show Chart
         </Button>
       </Stack>
-    </>
+    </Form>
   );
 };
-export { Form };
+export { DwellingPricesForm };

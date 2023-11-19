@@ -1,26 +1,45 @@
-import React from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { useLocation, useParams } from "react-router-dom";
+import { Bar, BarChart, CartesianGrid, Label, Tooltip, XAxis, YAxis } from "recharts";
+import { CustomTooltip } from "./CustomTooltip";
+import { styled } from "@mui/material";
 
-interface PriceValue {
-  date: string;
-  price: number;
-}
+const SimpleBarChart = () => {
+  const { dwellingType, fromYear, fromQuarter, toYear, toQuarter } = useParams();
+  const {
+    state: { priceValuesByDate },
+  } = useLocation();
 
-interface SimpleBarChartProps {
-  priceValuesByDate: PriceValue[];
-}
-
-const SimpleBarChart: React.FC<SimpleBarChartProps> = ({ priceValuesByDate }) => {
   return (
-    <BarChart width={600} height={400} data={priceValuesByDate} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
-      <YAxis />
-      <Tooltip />
-      <Legend />
-      <Bar dataKey="price" fill="#8884d8" />
-    </BarChart>
+    <figure style={{ margin: 0 }}>
+      <StyledFigcaption>Prices for dwelling type "{dwellingType?.toLowerCase()}"</StyledFigcaption>
+      <BarChart width={600} height={400} data={priceValuesByDate} margin={{ top: 20, left: 25, bottom: 10 }}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="date" tick={{ fontSize: 14 }} angle={0} hide />
+        <YAxis tick={{ fontSize: 14 }}>
+          <Label
+            value="NOK"
+            position="insideLeft"
+            angle={-90}
+            style={{
+              textAnchor: "middle",
+              fontSize: 16,
+            }}
+            offset={-6}
+          />
+        </YAxis>
+        <Tooltip content={<CustomTooltip />} />
+        <Bar dataKey="price" fill="#4CAF50" />
+      </BarChart>
+    </figure>
   );
 };
+
+const StyledFigcaption = styled("figcaption")(() => ({
+  fontSize: "22px",
+  color: "rgb(128, 128, 128)",
+  textAlign: "center",
+  margin: "0 0 0 56px",
+  padding: "0 0 20px 0",
+}));
 
 export { SimpleBarChart };

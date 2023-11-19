@@ -1,28 +1,17 @@
-import "./App.css";
-import { SimpleBarChart } from "./Chart";
+import { Providers } from "./Providers";
 
-// - routing podpiąć
-// - Parametry z formularza powinny być w adresie URL
-// - parametry powinny być zachowane między sesjami przeglądarki
+//  Ładny background, a sam formularz na białym tle z zaokrąglonymi rogami
+//  Zustand do zarządzania stanem, RHF do wyświetlenie błędu, jak brakuje danych
 
-// - Możliwość zapisywania statystyk do dalszego wykorzystania
-// - Możliwość dodawania pojedynczych komentarzy do prezentowanych statystyk
-// - Możliwość edytowania pojedynczych komentarzy do prezentowanych statystyk
-// - Komentarz może być przechowywany w pamięci lokalnej (Local storage)
+//  Parametry powinny być zachowane między sesjami przeglądarki (chatGPT zapytaj albo zustand)
+//  Possibility to add and edit single comment for the presented statistics.
+//  We would like you also to add the possibility to save statistics for further use with the
+//  The comment may be stored in Local Storage, so it can be later used when viewing the statistics.
 
 function App() {
-  const priceValuesByDate = priceValues.map((value, index) => ({ date: quartersRange[index], price: value }));
-
   return (
     <>
-      <main>
-        {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
-        {/* <pre>{JSON.stringify(typeOfDwellings, null, 2)}</pre>
-        <pre>{JSON.stringify(quartersAvailableByYear, null, 2)}</pre>
-        <pre>{JSON.stringify(yearsAvailable, null, 2)}</pre> */}
-
-        <SimpleBarChart priceValuesByDate={priceValuesByDate}></SimpleBarChart>
-      </main>
+      <Providers />
     </>
   );
 }
