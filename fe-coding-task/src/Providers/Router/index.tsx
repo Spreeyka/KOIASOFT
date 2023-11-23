@@ -6,7 +6,6 @@ import { SimpleBarChart } from "../../Chart";
 import { loader } from "../../Form/dataLoaders/initialDataLoader";
 import { Layout } from "../../Layout";
 import { ErrorPage } from "../../ErrorPage";
-import { dwellingPricesLoader } from "../../Form/dataLoaders/dwellingPricesLoader";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,8 +37,6 @@ const router = createBrowserRouter([
         <SimpleBarChart />
       </Layout>
     ),
-    // @ts-ignore
-    //loader: dwellingPricesLoader(queryClient),
   },
 ]);
 

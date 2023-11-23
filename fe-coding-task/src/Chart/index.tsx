@@ -14,13 +14,13 @@ const SimpleBarChart = () => {
   const {
     state: { priceValuesByDate },
   } = useLocation();
-  const { statToggledAsFavorite: toggleStatFavorite, savedStats } = useStore((state) => state);
+  const { statToggledAsFavorite, savedStats } = useStore((state) => state);
 
   const url = useResolvedPath("").pathname;
-  const isFavorite = savedStats.includes(url);
+  const isFavorite = savedStats.find((stat) => stat.path === url);
 
   const toggleFavoriteStat = () => {
-    toggleStatFavorite(url);
+    statToggledAsFavorite({ path: url, data: priceValuesByDate });
   };
 
   return (
