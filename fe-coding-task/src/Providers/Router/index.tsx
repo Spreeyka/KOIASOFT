@@ -5,6 +5,8 @@ import { DwellingPricesForm } from "../../Form";
 import { SimpleBarChart } from "../../Chart";
 import { loader } from "../../Form/dataLoaders/initialDataLoader";
 import { Layout } from "../../Layout";
+import { ErrorPage } from "../../ErrorPage";
+import { dwellingPricesLoader } from "../../Form/dataLoaders/dwellingPricesLoader";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,7 +24,12 @@ const router = createBrowserRouter([
         <DwellingPricesForm />
       </Layout>
     ),
-    // loader: loader(queryClient),
+    loader: loader(queryClient),
+    errorElement: (
+      <Layout>
+        <ErrorPage />
+      </Layout>
+    ),
   },
   {
     path: "/prices/:dwellingType/:fromYear/:fromQuarter/:toYear/:toQuarter",
@@ -31,6 +38,8 @@ const router = createBrowserRouter([
         <SimpleBarChart />
       </Layout>
     ),
+    // @ts-ignore
+    //loader: dwellingPricesLoader(queryClient),
   },
 ]);
 

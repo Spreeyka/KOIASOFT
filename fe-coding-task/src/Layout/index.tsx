@@ -8,11 +8,11 @@ const Layout = ({ children }: { children: ReactNode }) => {
 const StyledMain = styled("main")(() => ({
   display: "flex",
   flexDirection: "column",
-  justifyContent: "flex-start", // Change this to "flex-start"
   alignItems: "center",
-  padding: "100px",
-  minHeight: "calc(100vh)",
-  backgroundColor: "#f5fdf9",
+  minHeight: "100vh",
+  position: "relative",
+  padding: "100px 0 60px 0",
+  backgroundColor: "#DEFFE0 ",
 }));
 
 export { Layout };

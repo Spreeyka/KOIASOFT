@@ -1,14 +1,16 @@
 import { Providers } from "./Providers";
+import { useStore } from "./store";
 
-//  Ładny background, a sam formularz na białym tle z zaokrąglonymi rogami
-//  Zustand do zarządzania stanem, RHF do wyświetlenie błędu, jak brakuje danych
+// Naprawa, żeby linki poprawnie działały
+// Wpisane rzeczy do inputa w local Storage (Zustand persist)
+// Podpięcie RHF do wyświetlenie błędu, jak brakuje danych wpisanych w jakiś input
 
-//  Parametry powinny być zachowane między sesjami przeglądarki (chatGPT zapytaj albo zustand)
-//  Possibility to add and edit single comment for the presented statistics.
-//  We would like you also to add the possibility to save statistics for further use with the
-//  The comment may be stored in Local Storage, so it can be later used when viewing the statistics.
+// Refaktoring
 
 function App() {
+  const store = useStore((state) => state);
+  console.log("store", store);
+
   return (
     <>
       <Providers />
