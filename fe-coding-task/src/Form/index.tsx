@@ -74,6 +74,7 @@ const DwellingPricesForm = () => {
 
   return (
     <StyledBox>
+      <StyledHeading>Select dwelling type and year range</StyledHeading>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2.4} width={400}>
           <FormControl fullWidth>
@@ -210,6 +211,13 @@ const DwellingPricesForm = () => {
   );
 };
 
+const StyledHeading = styled("h1")(() => ({
+  fontSize: "22px",
+  textAlign: "center",
+  margin: "0 0 30px 0",
+  fontWeight: "bold",
+}));
+
 const StyledErrorBox = styled(Paper)(() => ({
   marginTop: "18px",
   padding: "10px",
@@ -220,7 +228,7 @@ const StyledErrorBox = styled(Paper)(() => ({
 }));
 
 const StyledBox = styled(Paper)(() => ({
-  padding: "60px 30px",
+  padding: "50px 30px 60px 30px",
   backgroundColor: "white",
   borderRadius: "20px",
   boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
